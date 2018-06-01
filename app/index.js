@@ -35,6 +35,7 @@ class App extends React.Component {
       let data = JSON.parse(event.data)
       let { delta, customStyleMap, users } = data
       if (!delta) return
+      
       let raw = convertToRaw(this.state.editorState.getCurrentContent())
       console.log({ raw, delta })
       let patched = patch(raw, delta)
@@ -44,21 +45,28 @@ class App extends React.Component {
         convertFromRaw(patched)
       )
       editorState = removeEntities(editorState)
-      let keys = Object.keys(users)
-        .filter(key => users[key].selection && key !== this.userId)
-      editorState = keys.reduce((acc, key) =>
-        applyCursor(
-          acc,
-          users[key].selection,
-        ), editorState
-      )
-      window.localStorage.setItem(
-        'raw',
-        JSON.stringify(convertToRaw(editorState.getCurrentContent()))
-      )
+      if (users) {
+        let keys = Object.keys(users)
+          .filter(key => users[key].selection && key !== this.userId)
+        editorState = keys.reduce((acc, key) =>
+          applyCursor(
+            acc,
+            users[key].selection,
+          ), editorState
+        )
+        window.localStorage.setItem(
+          'raw',
+          JSON.stringify(convertToRaw(editorState.getCurrentContent()))
+        )
+      }
       this.setState({
         editorState,
-        customStyleMap
+        customStyleMap: {
+          ...customStyleMap,
+          [this.userId]: {
+            backgroundColor: 'transparent'
+          }
+        }
       })
     }
   }
