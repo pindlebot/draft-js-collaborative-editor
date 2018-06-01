@@ -2,7 +2,6 @@ const http = require('http')
 const WebSocket = require('ws');
 const { EditorState, convertToRaw } = require('draft-js')
 const { diff, patch } = require('jsondiffpatch')
-const applyCursor = require('./applyCursor')
 
 function noop() {}
 
@@ -30,6 +29,19 @@ const colors = [
 const users = {}
 const customStyleMap = {}
 
+let state = createEmpty()
+let initialState = createEmpty()
+
+const send = ({ delta, client }) => {
+  client.send(
+    JSON.stringify({
+      delta,
+      users,
+      customStyleMap
+    })
+  )
+}
+
 module.exports = (app) => {
   const server = http.createServer(app)
   const wss = new WebSocket.Server({ server })
@@ -42,7 +54,7 @@ module.exports = (app) => {
       ws.ping(noop);
     });
   }, 30000);
-  // Broadcast to all.
+
   wss.broadcast = function broadcast(data) {
     wss.clients.forEach(function each(client) {
       if (client.readyState === WebSocket.OPEN) {
@@ -51,13 +63,9 @@ module.exports = (app) => {
     })
   }
 
-  let state = createEmpty()
-  let initialState = createEmpty()
-
   const getDiff = raw => diff(state, raw)
 
   const applyDiff = diff => {
-    if (!diff) return state
     state = patch(state, diff)
     return state
   }
@@ -71,27 +79,29 @@ module.exports = (app) => {
         backgroundColor: color
       }
     }
+    ws.on('close', function close() {
+      console.log('disconnected')
+      delete users[token]
+      delete customStyleMap[token]
+    })
 
     ws.isAlive = true;
     ws.on('pong', heartbeat)
-    ws.send(JSON.stringify({ delta: diff(initialState, state), customStyleMap, users }))
+    let delta = diff(initialState, state)
+    send({ delta, client: ws })
     ws.on('message', function incoming(data) {
       let { raw, selection } = JSON.parse(data)      
       users[token].selection = selection
       let delta = getDiff(raw)
+      if (!delta) return
       applyDiff(delta)
       
       wss.clients.forEach(function each(client) {
         if (client !== ws && client.readyState === WebSocket.OPEN) {
-          client.send(JSON.stringify({
-            delta,
-            customStyleMap,
-            users
-          }))
+          send({ client, delta })
         }
       })
     })
   })
-
   return server
 }

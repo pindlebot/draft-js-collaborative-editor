@@ -27,9 +27,9 @@ class App extends React.Component {
 
   componentDidMount () {
     this.userId = document.cookie.split('=')[1]
-    // let host = window.document.location.host.replace(/:.*/, '');
-    // let url = 'ws://' + host + ':1234'
-    let host = location.origin.replace(/^http/, 'ws')
+    let host = process.env.NODE_ENV !== 'production' 
+      ? 'ws://' + window.document.location.host.replace(/:.*/, '') + ':1234'
+      : location.origin.replace(/^http/, 'ws')
     console.log(host)
     this.ws = new WebSocket(host)
     this.ws.onmessage = (event) => {
@@ -42,20 +42,11 @@ class App extends React.Component {
         this.state.editorState,
         convertFromRaw(patched)
       )
-      editorState = removeEntities(editorState)
       if (users) {
-        let keys = Object.keys(users)
+        let cursors = Object.keys(users)
           .filter(key => users[key].selection && key !== this.userId)
-        editorState = keys.reduce((acc, key) =>
-          applyCursor(
-            acc,
-            users[key].selection,
-          ), editorState
-        )
-        window.localStorage.setItem(
-          'raw',
-          JSON.stringify(convertToRaw(editorState.getCurrentContent()))
-        )
+          .map(key => users[key].selection)
+        editorState = applyCursor(editorState, cursors)
       }
       this.setState({
         editorState,
@@ -84,7 +75,7 @@ class App extends React.Component {
 
   process = debounce(() => {
     this.notify()
-  }, 1000)
+  }, 300)
 
   onChange = editorState => {
     this.process()

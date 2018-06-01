@@ -5,7 +5,8 @@
   "license": "MIT",
   "scripts": {
     "dev": "node server",
-    "start": "NODE_ENV=production node server"
+    "start": "NODE_ENV=production node server",
+    "build": "NODE_ENV=production parcel build app/index.html --public-url ./ --no-minify"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

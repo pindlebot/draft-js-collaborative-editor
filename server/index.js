@@ -1,14 +1,19 @@
 const express = require('express')
-// const Bundler = require('parcel-bundler')
 const createServer = require('./createServer')
 const bodyParser = require('body-parser')
 
 const app = express()
 const PORT = process.env.PORT || 1234
-// const bundler = new Bundler('app/index.html')
 
 app.use(require('cookie-parser')())
-app.use(express.static('dist'))
+
+if (process.env.NODE_ENV !== 'production') {
+  const Bundler = require('parcel-bundler')
+  const bundler = new Bundler('app/index.html')
+  app.use(bundler.middleware())
+} else {
+  app.use(express.static('dist'))
+}
 
 const genID = () => Math.random().toString(36).substr(2, 9)
 
@@ -25,7 +30,6 @@ app.use((req, res, next) => {
 })
 
 app.use(bodyParser.json())
-// app.use(bundler.middleware())
 
 const server = createServer(app)
 
