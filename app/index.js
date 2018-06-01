@@ -27,19 +27,17 @@ class App extends React.Component {
 
   componentDidMount () {
     this.userId = document.cookie.split('=')[1]
-    let host = window.document.location.host.replace(/:.*/, '');
-    let url = 'ws://' + host + ':1234'
-    this.ws = new WebSocket(url);
-    
+    // let host = window.document.location.host.replace(/:.*/, '');
+    // let url = 'ws://' + host + ':1234'
+    let host = location.origin.replace(/^http/, 'ws')
+    console.log(host)
+    this.ws = new WebSocket(host)
     this.ws.onmessage = (event) => {
       let data = JSON.parse(event.data)
       let { delta, customStyleMap, users } = data
-      if (!delta) return
-      
+      if (!delta) return      
       let raw = convertToRaw(this.state.editorState.getCurrentContent())
-      console.log({ raw, delta })
       let patched = patch(raw, delta)
-
       let editorState = EditorState.push(
         this.state.editorState,
         convertFromRaw(patched)
