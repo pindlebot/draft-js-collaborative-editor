@@ -71,7 +71,8 @@ module.exports = (app) => {
   }
 
   wss.on('connection', function connection(ws, req) {
-    const token = req.headers.cookie.split('=')[1]
+    const token = req.headers.cookie && req.headers.cookie.split('=')[1]
+    if (!token) return
     if (!users[token]) {
       let color = colors[Math.floor(Math.random() * 10)]
       users[token] = {}
