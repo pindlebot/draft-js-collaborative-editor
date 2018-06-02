@@ -1,47 +1,11 @@
 import React from 'react'
 import { render } from 'react-dom'
-import {
-  EditorState,
-  convertFromRaw
-} from 'draft-js'
 import 'draft-js/dist/Draft.css'
-import { Editor, decorator } from '../src'
-import PropTypes from 'prop-types'
+import { Editor } from '../src'
 
-class Users extends React.Component {
-  static propTypes = {
-    users: PropTypes.object,
-    customStyleMap: PropTypes.object
-  }
-
-  render () {
-    const { users, customStyleMap } = this.props
-    return (
-      <div className='users'>
-        {Object.keys(customStyleMap).map(key =>
-          <div style={customStyleMap[key]}>
-            {key}
-          </div>
-        )}
-      </div>
-    )
-  }
-}
 let host = process.env.NODE_ENV !== 'production'
   ? 'ws://' + window.document.location.host.replace(/:.*/, '') + ':1234'
   : window.location.origin.replace(/^http/, 'ws')
-
-let contentState = convertFromRaw({
-  blocks: [{
-    key: 'A',
-    depth: 0,
-    text: '',
-    data: {},
-    inlineStyleRanges: [],
-    entityRanges: []
-  }],
-  entityMap: {}
-})
 
 class App extends React.Component {
   state = {

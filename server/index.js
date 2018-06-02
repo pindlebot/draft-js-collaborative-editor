@@ -5,6 +5,7 @@ const http = require('http')
 const WebSocket = require('ws')
 const session = require('express-session')
 const PORT = process.env.PORT || 1234
+const genID = require('./genID')
 
 const app = express()
 // app.use(require('cookie-parser')())
@@ -13,7 +14,10 @@ app.use(session({
   resave: false,
   saveUninitialized: true,
   cookie: { secure: false, httpOnly: false },
-  name: 'token'
+  name: 'token',
+  genid: function (req) {
+    return genID()
+  }
 }))
 
 if (process.env.NODE_ENV !== 'production') {

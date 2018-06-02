@@ -7,7 +7,7 @@
     "dev": "node server",
     "start": "NODE_ENV=production node server",
     "build": "NODE_ENV=production parcel build app/index.html --public-url ./ --no-minify",
-    "lint": "standard \"./app/*.js\" --fix --verbose | snazzy"
+    "lint": "standard \"./server/*.js\" --fix --verbose | snazzy"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

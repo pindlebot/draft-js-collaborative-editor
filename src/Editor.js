@@ -7,7 +7,6 @@ import {
   RichUtils
 } from 'draft-js'
 import debounce from 'debounce'
-import { decorator } from './decorator'
 import { getCursorStyle } from './getCursorStyle'
 import { applyDelta } from './applyDelta'
 import { unstable_deferredUpdates as deferredUpdates } from 'react-dom'
@@ -20,7 +19,7 @@ class CollaborativeEditor extends React.Component {
   }
 
   state = {
-    editorState: EditorState.createEmpty(decorator),
+    editorState: EditorState.createEmpty(),
     customStyleMap: {},
     cursors: []
   }
