@@ -1,0 +1,4 @@
+{
+  "standard.enable": true,
+  "typescript.validate.enable": false
+}

@@ -1,110 +1,129 @@
 import React from 'react'
-import { render } from 'react-dom'
 import PropTypes from 'prop-types'
 import {
   Editor,
   EditorState,
   convertToRaw,
-  Modifier,
-  CompositeDecorator,
-  SelectionState,
   RichUtils,
   convertFromRaw
 } from 'draft-js'
 import debounce from 'debounce'
-import { patch } from 'jsondiffpatch'
 import { decorator } from './decorator'
-import { applyCursor } from './applyCursor'
+import { getCursorStyle } from './getCursorStyle'
+import { applyDelta } from './applyDelta'
+import { unstable_deferredUpdates as deferredUpdates } from 'react-dom'
 
 class CollaborativeEditor extends React.Component {
   static propTypes = {
-    ws: PropTypes.object
+    editorState: PropTypes.object,
+    customStyleMap: PropTypes.object,
+    update: PropTypes.func
   }
 
   state = {
-    customStyleMap: {}
+    editorState: EditorState.createEmpty(decorator),
+    customStyleMap: {},
+    cursors: []
+  }
+
+  _isUnmounted = false
+
+  handleMessage = ({ delta, customStyleMap, users, transactionId }) => {
+    let editorState = this.state.editorState
+    let nextEditorState = applyDelta(editorState, delta)
+    this.setState({
+      customStyleMap: {
+        ...customStyleMap,
+        [this.props.userId]: {
+          backgroundColor: 'transparent'
+        }
+      },
+      editorState: nextEditorState
+    }, () => {
+      deferredUpdates(() => {
+        let cursors = users
+          .filter(user => user.selection && user.id !== this.props.userId)
+          .map(({ selection, id }) => getCursorStyle(nextEditorState, selection))
+          .filter(style => style)
+        this.setState({
+          cursors
+        })
+      })
+    })
   }
 
   componentDidMount () {
-    this.userId = document.cookie.split('=')[1]
-
+    console.log(this.props)
     this.props.ws.onmessage = (event) => {
-      let data = JSON.parse(event.data)
-      let { delta, customStyleMap, users } = data
-      if (!delta) return      
-      let raw = convertToRaw(this.props.editorState.getCurrentContent())
-      let patched = patch(raw, delta)
-      let editorState = EditorState.push(
-        this.props.editorState,
-        convertFromRaw(patched)
-      )
-      if (users) {
-        let cursors = Object.keys(users)
-          .filter(key => users[key].selection && key !== this.props.userId)
-          .map(key => users[key].selection)
-        editorState = applyCursor(editorState, cursors)
-      }
-      this.props.onChange(editorState)
-
-      this.setState({
-        customStyleMap: {
-          ...customStyleMap,
-          [this.props.userId]: {
-            backgroundColor: 'transparent'
-          }
-        }
-      })
+      if (this._isUnmounted) return
+      this.handleMessage(JSON.parse(event.data))
     }
+
+    window.addEventListener('resize', this.resize)
   }
 
-  notify = () => {
-    let raw = convertToRaw(this.props.editorState.getCurrentContent())
-    let selection = this.props.editorState.getSelection().toJS()
+  componentWillUnmount () {
+    this._isUnmounted = true
+    window.removeEventListener('resize', this.resize)
+  }
+
+  resize = debounce((evt) => {
+    if (this.state.cursors.length) {
+      this.setState({ cursors: [] })
+    }
+  }, 200)
+
+  broadcast = debounce(() => {
+    let editorState = this.state.editorState
+    let contentState = editorState.getCurrentContent()
+    let raw = convertToRaw(contentState)
     this.props.ws.send(
       JSON.stringify({
         raw,
-        selection: selection,
+        selection: editorState.getSelection().toJS(),
         timestamp: Date.now(),
-        id: this.userId
+        id: this.props.userId
       })
     )
-  }
-
-  process = debounce(() => {
-    this.notify()
   }, 300)
 
   onChange = editorState => {
-    this.process()
+    this.broadcast()
     let nextEditorState = editorState
-    if (!editorState.getDecorator()) {
+    if (!nextEditorState.getDecorator()) {
       nextEditorState = EditorState.set('decorator', decorator)
     }
-    let currentInlineStyles = editorState.getCurrentInlineStyle()
+    let currentInlineStyles = nextEditorState.getCurrentInlineStyle()
     if (!currentInlineStyles.has(this.props.userId)) {
       nextEditorState = RichUtils.toggleInlineStyle(nextEditorState, this.props.userId)
     }
 
     let keys = Object.keys(this.state.customStyleMap)
-      .filter(key => key !== this.userId)
+      .filter(key => key !== this.props.userId)
 
     nextEditorState = keys.reduce((acc, key) =>
       currentInlineStyles.has(key)
         ? RichUtils.toggleInlineStyle(acc, key)
         : acc, nextEditorState
     )
-    this.props.onChange(nextEditorState)
+    this.setState({ editorState: nextEditorState })
   }
 
   render () {
-    const { editorState, ws, ...rest } = this.props
+    const { cursors } = this.state
+    const { ws, userId, ...rest } = this.props
     return (
-      <Editor
-        onChange={this.onChange}
-        editorState={this.props.editorState}
-        customStyleMap={this.state.customStyleMap}
-        {...rest}
-      />   
+      <React.Fragment>
+        {cursors.map((cursor, i) =>
+          <span className={'cursor'} style={cursor} key={i} />
+        )}
+        <Editor
+          onChange={this.onChange}
+          editorState={this.state.editorState}
+          customStyleMap={this.state.customStyleMap}
+          {...rest}
+        />
+      </React.Fragment>
     )
   }
 }

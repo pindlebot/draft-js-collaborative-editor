@@ -5,17 +5,20 @@
   <title>draft-js-delta</title>
   <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
   <style>
+    body {
+      background-color: #fafafa;
+    }
     .container {
       width: 720px;
       margin: 1em auto;
-      background-color: #fafafa;
     }
 
     .column {
       display: flex;
       min-height: 600px;
       flex-direction: column;
-      flex-basis: 50%;
+      flex-basis: 100%;
+      border: 1px solid #ddd;
     }
 
     .row {
@@ -24,7 +27,39 @@
     }
 
     .cursor {
-      /* animation: cursor 1.5s linear infinite; */
+      position: absolute;
+      width: 0;
+      top: 0;
+      left: 0;
+      z-index: 999;
+      animation: blink-empty 1s infinite;
+      border-left: transparent solid 1px;
+    }
+
+    .blink {
+      animation: blink-empty 1s infinite;
+      border-left: transparent solid 1px;
+      margin-right: 100px;
+    }
+
+    .label {
+      background-color: #fafafa;
+      color: #999;
+      opacity: 0.8;
+    }
+
+    .users {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      padding: 10px;
+      width: 100%;
+    }
+
+    .users > div {
+      display: block;
+      padding: 10px;
+      margin: 5px;
     }
 
     @keyframes blink-empty {
@@ -37,6 +72,6 @@
 <link rel="stylesheet" href="app.06fbafb0.css"></head>
 <body>
   <div id="root"></div>
-  <script src="app.f707a4af.js"></script>
+  <script src="app.c868d80d.js"></script>
 </body>
 </html>

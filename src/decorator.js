@@ -2,10 +2,10 @@ import React from 'react'
 import { CompositeDecorator } from 'draft-js'
 
 class Cursor extends React.Component {
-  render() {
+  render () {
     const style = {
       animation: 'blink-empty 1s infinite',
-      borderLeft: 'transparent solid 1px',
+      borderLeft: 'transparent solid 1px'
     }
     return (
       <span data-offset-key={this.props.offsetkey}>
@@ -16,10 +16,10 @@ class Cursor extends React.Component {
   }
 }
 
-function strategy(contentBlock, cb, contentState) {
-  if (!contentState) return;
+function strategy (contentBlock, cb, contentState) {
+  if (!contentState) return
   contentBlock.findEntityRanges((character) => {
-    const entityKey = character.getEntity();
+    const entityKey = character.getEntity()
     if (entityKey === null) {
       return false
     }
@@ -28,7 +28,7 @@ function strategy(contentBlock, cb, contentState) {
     const entityData = entity.getData()
     return (
       entityType === 'CURSOR'
-    );
+    )
   }, cb)
 }
 

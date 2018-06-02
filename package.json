@@ -6,30 +6,43 @@
   "scripts": {
     "dev": "node server",
     "start": "NODE_ENV=production node server",
-    "build": "NODE_ENV=production parcel build app/index.html --public-url ./ --no-minify"
+    "build": "NODE_ENV=production parcel build app/index.html --public-url ./ --no-minify",
+    "lint": "standard \"./app/*.js\" --fix --verbose | snazzy"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
+    "babel-eslint": "^8.2.3",
     "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-flow-strip-types": "^6.22.0",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-preset-env": "^1.7.0",
     "babel-preset-flow": "^6.23.0",
     "babel-preset-react": "^6.24.1",
+    "flow-bin": "^0.73.0",
     "lodash.debounce": "^4.0.8",
-    "parcel-bundler": "^1.8.1"
+    "parcel-bundler": "^1.8.1",
+    "snazzy": "^7.1.1",
+    "standard": "^11.0.1"
   },
   "dependencies": {
     "body-parser": "^1.18.3",
+    "cookie-parser": "^1.4.3",
+    "debounce": "^1.1.0",
     "draft-js": "^0.10.5",
+    "draft-js-compact": "^0.0.4",
     "express": "^4.16.3",
     "immutable": "^3.8.2",
-    "draft-js-compact": "^0.0.4",
     "is-plain-object": "^2.0.4",
     "jsondiffpatch": "^0.3.10",
     "react": "^16.4.0",
     "react-dom": "^16.4.0",
-    "ws": "^5.2.0",
-    "cookie-parser": "^1.4.3",
-    "debounce": "^1.1.0"
+    "uuid": "^3.2.1",
+    "ws": "^5.2.0"
+  },
+  "standard": {
+    "parser": "babel-eslint",
+    "ignore": [
+      "node_modules"
+    ]
   }
 }
