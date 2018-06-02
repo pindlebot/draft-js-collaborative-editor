@@ -4,8 +4,7 @@ import {
   Editor,
   EditorState,
   convertToRaw,
-  RichUtils,
-  convertFromRaw
+  RichUtils
 } from 'draft-js'
 import debounce from 'debounce'
 import { decorator } from './decorator'
@@ -53,7 +52,6 @@ class CollaborativeEditor extends React.Component {
   }
 
   componentDidMount () {
-    console.log(this.props)
     this.props.ws.onmessage = (event) => {
       if (this._isUnmounted) return
       this.handleMessage(JSON.parse(event.data))

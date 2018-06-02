@@ -3,7 +3,6 @@ import { create } from 'jsondiffpatch'
 
 const j = create({
   objectHash: function (obj, index) {
-    console.log(obj)
     return obj.key || '$$index:' + index
   }
 })

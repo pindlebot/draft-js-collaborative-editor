@@ -31,6 +31,7 @@
     "draft-js": "^0.10.5",
     "draft-js-compact": "^0.0.4",
     "express": "^4.16.3",
+    "express-session": "^1.15.6",
     "immutable": "^3.8.2",
     "is-plain-object": "^2.0.4",
     "jsondiffpatch": "^0.3.10",

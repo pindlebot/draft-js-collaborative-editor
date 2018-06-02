@@ -22,7 +22,6 @@ const colors = [
 ]
 
 module.exports = () => {
-  let availableColors = [...colors]
   const users = {}
   const customStyleMap = {}
 
