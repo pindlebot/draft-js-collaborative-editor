@@ -3,9 +3,11 @@ import { render } from 'react-dom'
 import 'draft-js/dist/Draft.css'
 import { Editor } from '../src'
 
-let host = process.env.NODE_ENV !== 'production'
-  ? 'ws://' + window.document.location.host.replace(/:.*/, '') + ':1234'
-  : window.location.origin.replace(/^http/, 'ws')
+//let host = process.env.NODE_ENV !== 'production'
+//  ? 'ws://' + window.document.location.host.replace(/:.*/, '') + ':1234'
+//  : window.location.origin.replace(/^http/, 'ws')
+
+let host = window.location.origin.replace(/^http/, 'ws')
 
 class App extends React.Component {
   state = {
