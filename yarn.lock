@@ -1756,6 +1756,10 @@ draft-js-compact@^0.0.4:
   dependencies:
     is-plain-object "^2.0.4"
 
+draft-js-text-width@^0.0.1:
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/draft-js-text-width/-/draft-js-text-width-0.0.1.tgz#afb00693e8d8db71bbdc7a332751a7855e77f911"
+
 draft-js@^0.10.5:
   version "0.10.5"
   resolved "https://registry.yarnpkg.com/draft-js/-/draft-js-0.10.5.tgz#bfa9beb018fe0533dbb08d6675c371a6b08fa742"

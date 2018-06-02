@@ -30,6 +30,7 @@
     "debounce": "^1.1.0",
     "draft-js": "^0.10.5",
     "draft-js-compact": "^0.0.4",
+    "draft-js-text-width": "^0.0.1",
     "express": "^4.16.3",
     "express-session": "^1.15.6",
     "immutable": "^3.8.2",

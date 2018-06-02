@@ -87,9 +87,6 @@ class CollaborativeEditor extends React.Component {
   onChange = editorState => {
     this.broadcast()
     let nextEditorState = editorState
-    if (!nextEditorState.getDecorator()) {
-      nextEditorState = EditorState.set('decorator', decorator)
-    }
     let currentInlineStyles = nextEditorState.getCurrentInlineStyle()
     if (!currentInlineStyles.has(this.props.userId)) {
       nextEditorState = RichUtils.toggleInlineStyle(nextEditorState, this.props.userId)
